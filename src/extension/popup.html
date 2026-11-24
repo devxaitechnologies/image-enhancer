@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Image Enhancer</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup" aria-label="Image Enhancer">
+      <header class="brand">
+        <span class="logo-wrap" aria-hidden="true">
+          <img src="assets/logo-shape.svg" alt="">
+        </span>
+        <span class="brand-copy">
+          <span class="brand-name">Image Enhancer</span>
+          <span class="brand-note">Enhance your images automatically</span>
+        </span>
+      </header>
+
+      <section class="setting-group" aria-labelledby="enable-label">
+        <span class="feature-icon feature-icon-toggle" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <rect x="4" y="7" width="16" height="10" rx="5"></rect>
+            <circle cx="9" cy="12" r="2.4"></circle>
+          </svg>
+        </span>
+        <div class="setting-text">
+          <div id="enable-label" class="setting-title">Enable on Gemini</div>
+          <div class="setting-note" id="enable-note">Turn off if Gemini becomes slow or behaves unexpectedly</div>
+        </div>
+        <label class="switch" aria-label="Enable on Gemini">
+          <input id="enable-toggle" type="checkbox" checked>
+          <span class="switch-track" aria-hidden="true"></span>
+        </label>
+      </section>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

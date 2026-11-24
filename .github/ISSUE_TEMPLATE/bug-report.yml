@@ -1,0 +1,55 @@
+name: Bug report
+description: Report a reproducible problem
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please attach the original file so the issue can be reproduced accurately.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem description
+      description: Describe the actual and expected result.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Usage method and version
+      description: For example browser extension, userscript or CLI, including the exact version.
+      placeholder: "Browser extension 1.0.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: List the steps that reproduce the problem.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: upload
+    id: original-file
+    attributes:
+      label: Original file
+      description: Upload the original, unmodified file. Screenshots, crops, compressed or converted files are not substitutes; use a ZIP archive if needed.
+    validations:
+      required: true
+      accept: ".png,.jpg,.jpeg,.webp,.mp4,.mov,.webm,.zip"
+
+  - type: upload
+    id: result-file
+    attributes:
+      label: Processed result or screenshot
+      description: Optional. Upload the processed file or a screenshot that shows the problem.
+    validations:
+      required: false
+      accept: ".png,.jpg,.jpeg,.webp,.mp4,.mov,.webm,.zip"

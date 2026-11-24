@@ -1,0 +1,3 @@
+display_name: Image Enhancer
+short_description: Enhance local image files via the project CLI.
+default_prompt: Enhance the provided local image files. First determine an explicit output path or output directory, then run the Skill runtime with the remove subcommand (for example node scripts/run.mjs remove <input> --output <file> or node scripts/run.mjs remove <input-dir> --out-dir <dir>) and report the final written file paths.
