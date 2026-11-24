@@ -146,15 +146,11 @@ function cleanDistBuildOutputs() {
   if (!existsSync('dist')) return;
   for (const entry of [
     'app.js',
-    'dev-preview.html',
     'extension',
     'extension-local',
     'index.html',
-    'tampermonkey-worker-probe.html',
-    'tampermonkey-worker-probe.user.js',
     'video-app.js',
     'video-preview.html',
-    'userscript',
     'workers'
   ]) {
     const target = join('dist', entry);
@@ -236,7 +232,7 @@ async function serveStaticDevDist(rootDir = 'dist', defaultPort = 4173) {
     // In dev mode, expose the internal single-image debug harness at `/`
     // instead of the public landing entry. The landing page still ships to
     // `dist/index.html` for prod deploys and can be reached at `/index.html`.
-    const devHarnessPath = '/dev-preview.html';
+    const devHarnessPath = '/index.html';
     const requestPath =
       urlPath === '/' || urlPath === ''
         ? devHarnessPath
@@ -256,7 +252,7 @@ async function serveStaticDevDist(rootDir = 'dist', defaultPort = 4173) {
     const targetIsDir = targetExists && statSync(targetPath).isDirectory();
 
     if ((!targetExists || targetIsDir) && isSpaRoute) {
-      targetPath = resolve(join(distRoot, 'dev-preview.html'));
+      targetPath = resolve(join(distRoot, 'index.html'));
     }
 
     if (!existsSync(targetPath)) {
@@ -279,7 +275,7 @@ async function serveStaticDevDist(rootDir = 'dist', defaultPort = 4173) {
 
   server.listen(port, () => {
     console.log(`🌐 Dev server running at http://localhost:${port}`);
-    console.log(`   ↳ internal debug harness: http://localhost:${port}/ (dev-preview.html)`);
+    console.log(`   ↳ internal debug harness: http://localhost:${port}/`);
     console.log(`   ↳ public landing entry:   http://localhost:${port}/index.html`);
   });
 
@@ -346,22 +342,6 @@ const userscriptPageProcessorBuild = await esbuild.build({
 });
 const userscriptPageProcessorCode = userscriptPageProcessorBuild.outputFiles?.[0]?.text || '';
 
-// Build userscript
-const userscriptCtx = await esbuild.context({
-  ...commonConfig,
-  entryPoints: ['src/userscript/index.js'],
-  format: 'iife',
-  outfile: 'dist/userscript/image-enhancer.user.js',
-  banner: { js: userscriptBanner },
-  minify: false,
-  define: {
-    __US_WORKER_CODE__: JSON.stringify(userscriptWorkerCode),
-    __US_PAGE_PROCESSOR_CODE__: JSON.stringify(userscriptPageProcessorCode),
-    __US_INLINE_WORKER_ENABLED__: 'false',
-    __GWR_AUTO_INIT_USERSCRIPT__: 'true'
-  }
-});
-
 const extensionMainCtx = await esbuild.context({
   ...commonConfig,
   entryPoints: ['src/extension/contentMain.js'],
@@ -401,7 +381,6 @@ const extensionServiceWorkerCtx = await esbuild.context({
 console.log(`🚀 Starting build process... [${isProd ? 'PRODUCTION' : 'DEVELOPMENT'}]`);
 
 cleanDistBuildOutputs();
-mkdirSync('dist/userscript', { recursive: true });
 mkdirSync('dist/workers', { recursive: true });
 mkdirSync(join(EXTENSION_DIR, 'assets'), { recursive: true });
 writeExtensionManifest();
@@ -412,7 +391,6 @@ if (isProd) {
     websiteCtx.rebuild(),
     videoWebsiteCtx.rebuild(),
     workerCtx.rebuild(),
-    userscriptCtx.rebuild(),
     extensionMainCtx.rebuild(),
     extensionIsolatedCtx.rebuild(),
     extensionServiceWorkerCtx.rebuild()
@@ -426,7 +404,6 @@ if (isProd) {
     websiteCtx.watch(),
     videoWebsiteCtx.watch(),
     workerCtx.watch(),
-    userscriptCtx.watch(),
     extensionMainCtx.watch(),
     extensionIsolatedCtx.watch(),
     extensionServiceWorkerCtx.watch()

@@ -539,7 +539,7 @@ async function routeImageFile(file) {
     try {
         setStatus('正在进入图片调试流程...');
         await saveDebugFileHandoff(file, 'image');
-        window.location.assign('./dev-preview.html?fileHandoff=1');
+        window.location.assign('./?fileHandoff=1');
     } catch (error) {
         console.error(error);
         setStatus(error.message || '无法进入图片调试流程，请打开单图页后重新选择文件。', 'warn');

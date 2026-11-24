@@ -38,7 +38,7 @@ const TEXT = {
     copy: 'Copy result',
     copyFailed: 'Copy failed',
     unsupportedFile: 'Please choose a JPG, PNG or WebP image, or an MP4/WebM/MOV video.',
-    fileTooLarge: 'The image debug page does not process images larger than 20 MB. Videos open the video debug page.',
+    fileTooLarge: 'Images larger than 20 MB are not supported. Videos open the video page.',
     skippedLargeImages: 'Skipped images larger than 20 MB.',
     handoffVideo: 'Opening the video workflow...',
     progress: 'Progress',
