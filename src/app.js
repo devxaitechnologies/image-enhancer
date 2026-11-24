@@ -312,6 +312,7 @@ async function consumePendingImageHandoff() {
 
 async function processSingle(item) {
     try {
+        setStatusMessage(TEXT.processing);
         const img = await loadImage(item.file);
         item.originalImg = img;
         item.originalUrl = img.src;
@@ -330,6 +331,7 @@ async function processSingle(item) {
         setStatusMessage(TEXT.removed);
     } catch (error) {
         console.error(error);
+        setStatusMessage(TEXT.processFailed, 'warn');
     }
 }
 
@@ -358,7 +360,7 @@ function createImageCard(item) {
                 <span>${TEXT.copy}</span>
             </button>
             <button id="download-${item.id}" class="batch-button secondary" style="display: none;">
-                Download result
+                Download enhanced image
             </button>
         </div>
     `;
