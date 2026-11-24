@@ -28,7 +28,7 @@ const TEXT = {
     watermark: 'Detected overlay',
     position: 'Position',
     status: 'Status',
-    removed: 'Processed',
+    removed: 'Enhanced',
     skipped: 'Nothing to process; original kept',
     visibleResidual: 'Processed; minor residuals may remain',
     possibleContentDamage: 'Best result generated; please review the processed area',
@@ -372,18 +372,10 @@ async function processSingle(item) {
         item.originalImg = img;
         item.originalUrl = img.src;
 
-        originalImage.src = img.src;
-        renderSingleImageMeta(item);
-
         const processed = await processImageWithBestPath(item.file, img);
         item.processedMeta = processed.meta;
         item.processedBlob = processed.blob;
         item.processedUrl = URL.createObjectURL(processed.blob);
-
-        processedImage.src = item.processedUrl;
-        processedOverlay.style.display = 'block';
-        sliderHandle.style.display = 'flex';
-        processedInfo.style.display = 'block';
 
         copyBtn.style.display = 'flex';
         copyBtn.onclick = () => copyImage(item);
@@ -391,8 +383,7 @@ async function processSingle(item) {
         downloadBtn.style.display = 'flex';
         downloadBtn.onclick = () => downloadImage(item);
 
-        renderSingleProcessedMeta(item);
-        document.getElementById('comparisonContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setStatusMessage(TEXT.removed);
     } catch (error) {
         console.error(error);
     }
@@ -403,7 +394,7 @@ function createImageCard(item) {
     card.id = `card-${item.id}`;
     card.className = 'batch-card';
     card.innerHTML = `
-        <div class="batch-comparison">
+        <div class="batch-comparison" style="display: none;">
             <div class="batch-pane original">
                 <span class="batch-pane-label">Original</span>
                 <img id="original-${item.id}" class="batch-image" draggable="false" alt="" />
