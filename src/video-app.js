@@ -13,15 +13,8 @@ import {
     removeGeminiVideoWatermark
 } from './video/videoExport.js';
 import { isReferenceGeminiVideoSize } from './video/videoWatermarkCatalog.js';
-import {
-    getAutomaticVideoPresetConfig,
-    getRelocatedReviewPresetConfig
-} from './video/videoPresetPolicy.js';
+import { getAutomaticVideoPresetConfig } from './video/videoPresetPolicy.js';
 import { resolveAllenkFdncnnRuntimeProfile } from './video/videoDenoiseRuntimePolicy.js';
-import {
-    applyVideoAdaptiveAlphaDebugOverride,
-    applyVideoBitrateDebugOverride
-} from './video/videoDebugControlOverrides.js';
 import {
     createBatchQueue,
     enqueueBatchFiles,
@@ -95,8 +88,7 @@ const els = {
     detectBtn: $('detectBtn'),
     downloadBtn: $('downloadBtn'),
     resetBtn: $('resetBtn'),
-    cancelBtn: $('cancelBtn'),
-    relocatedReviewPresetBtn: $('relocatedReviewPresetBtn')
+    cancelBtn: $('cancelBtn')
 };
 
 function setStatus(message, tone = 'info') {
@@ -653,7 +645,6 @@ async function runExport(signal) {
         } else {
             applyAutomaticPreset(detectionPayload.detection, detectionPayload.metadata, { silent: true });
         }
-        applyDebugControlOverrides();
         const denoiseBackend = els.denoiseBackend.value || DEFAULT_DENOISE_BACKEND;
         const allenkFdncnnRuntimeProfile = resolveAllenkFdncnnRuntimeProfile(detectionPayload?.detection?.position);
         const allenkFdncnnSigma = resolveDetectionAllenkFdncnnSigma(detectionPayload?.detection);
@@ -954,45 +945,6 @@ function applyAutomaticPreset(detection = state.detection, metadata = state.meta
     return preset;
 }
 
-function applyDebugControlOverrides() {
-    applyVideoAdaptiveAlphaDebugOverride({
-        windowObject: window,
-        adaptiveAlphaInput: els.adaptiveAlpha
-    });
-    if (typeof window.__gwrVideoOverrideDenoiseBackend === 'string') {
-        if (els.denoiseBackend.value !== window.__gwrVideoOverrideDenoiseBackend) {
-            els.denoiseBackend.value = window.__gwrVideoOverrideDenoiseBackend;
-            els.denoiseBackend.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-    }
-    if (typeof window.__gwrVideoOverrideAllowLowConfidence === 'boolean') {
-        els.allowLowConfidence.checked = window.__gwrVideoOverrideAllowLowConfidence;
-    }
-    if (Number.isFinite(window.__gwrVideoOverrideEdgeDenoiseStrength)) {
-        setNumberControl(
-            els.edgeDenoiseStrength,
-            Math.max(0, Math.min(3, window.__gwrVideoOverrideEdgeDenoiseStrength))
-        );
-    }
-    if (Number.isFinite(window.__gwrVideoOverrideResidualCleanupStrength)) {
-        setNumberControl(
-            els.residualCleanup,
-            Math.max(0, Math.min(1.8, window.__gwrVideoOverrideResidualCleanupStrength))
-        );
-    }
-    applyVideoBitrateDebugOverride({
-        windowObject: window,
-        videoBitrateInput: els.videoBitrateMbps,
-        setNumberControl
-    });
-}
-
-function applyRelocatedReviewPreset() {
-    const preset = getRelocatedReviewPresetConfig();
-    applyPresetToControls(preset);
-    setStatus('已应用迁移锚点复核预设：Canvas 足迹抛光、12Mbps、允许低置信。此预设用于人工复核，不是默认策略。', 'warn');
-}
-
 function setupEvents() {
     els.dropzone.addEventListener('click', () => els.fileInput.click());
     els.dropzone.addEventListener('keydown', (event) => {
@@ -1038,7 +990,6 @@ function setupEvents() {
     els.processBtn.addEventListener('click', () => runExport());
     els.cancelBtn.addEventListener('click', cancelProcessing);
     els.resetBtn.addEventListener('click', reset);
-    els.relocatedReviewPresetBtn.addEventListener('click', applyRelocatedReviewPreset);
     els.downloadBtn.addEventListener('click', (event) => {
         if (!state.processedUrl || state.running) event.preventDefault();
     });
