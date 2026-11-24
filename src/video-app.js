@@ -731,7 +731,7 @@ async function runExport(signal) {
         updateCompareMode();
         syncProcessedToOriginal({ force: true });
         els.downloadBtn.href = state.processedUrl;
-        els.downloadBtn.download = `${state.file.name.replace(/\.[^.]+$/, '')}_gwr_video_mvp.mp4`;
+        els.downloadBtn.download = `${state.file.name.replace(/\.[^.]+$/, '')}_enhanced.mp4`;
         setProgress(1, '完成');
         const audioNote = result.audioCopied
             ? `音频已保留：${result.audioCodec || 'unknown'}，${result.audioPacketCount || 0} packets。`

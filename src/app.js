@@ -568,7 +568,7 @@ async function copyImage(item, targetBtn = copyBtn) {
 function downloadImage(item) {
     const a = document.createElement('a');
     a.href = item.processedUrl;
-    a.download = `unwatermarked_${item.name.replace(/\.[^.]+$/, '')}.png`;
+    a.download = `${item.name.replace(/\.[^.]+$/, "")}_enhanced.png`;
     a.click();
 }
 
