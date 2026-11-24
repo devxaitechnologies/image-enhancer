@@ -61,16 +61,10 @@ const singlePreview = document.getElementById('singlePreview');
 const multiPreview = document.getElementById('multiPreview');
 const imageList = document.getElementById('imageList');
 const progressText = document.getElementById('progressText');
-const originalImage = document.getElementById('originalImage');
-const processedImage = document.getElementById('processedImage');
-const originalInfo = document.getElementById('originalInfo');
-const processedInfo = document.getElementById('processedInfo');
 const downloadBtn = document.getElementById('downloadBtn');
 const copyBtn = document.getElementById('copyBtn');
 const resetBtn = document.getElementById('resetBtn');
 const batchResetBtn = document.getElementById('batchResetBtn');
-const processedOverlay = document.getElementById('processedOverlay');
-const sliderHandle = document.getElementById('sliderHandle');
 
 async function getEngine() {
     if (!enginePromise) {
@@ -141,7 +135,6 @@ async function init() {
 
         hideLoading();
         setupEventListeners();
-        setupSlider();
         await consumePendingImageHandoff();
     } catch (error) {
         hideLoading();
@@ -199,13 +192,6 @@ function reset() {
     fileInput.value = '';
     imageList.innerHTML = '';
     updateProgress();
-    originalImage.src = '';
-    processedImage.src = '';
-    originalInfo.innerHTML = '';
-    processedInfo.innerHTML = '';
-    processedInfo.style.display = 'none';
-    processedOverlay.style.display = 'none';
-    sliderHandle.style.display = 'none';
     copyBtn.style.display = 'none';
     downloadBtn.style.display = 'none';
     setStatusMessage('');
@@ -324,48 +310,6 @@ async function consumePendingImageHandoff() {
     }
 }
 
-function renderSingleImageMeta(item) {
-    if (!item?.originalImg) return;
-
-    const watermarkInfo = resolveDisplayWatermarkInfo(
-        item,
-        getEstimatedWatermarkInfo(item)
-    );
-    if (!watermarkInfo) return;
-
-    originalInfo.innerHTML = `
-        <p>${TEXT.size}: ${item.originalImg.width}x${item.originalImg.height}</p>
-        <p>${TEXT.watermark}: ${watermarkInfo.size}x${watermarkInfo.size}</p>
-        <p>${TEXT.position}: (${watermarkInfo.position.x},${watermarkInfo.position.y})</p>
-    `;
-}
-
-function getProcessedStatusPresentation(item) {
-    const presentation = resolveProcessedStatusPresentation(item);
-    return {
-        label: TEXT[presentation.messageKey],
-        tone: presentation.tone
-    };
-}
-
-function renderSingleProcessedMeta(item) {
-    if (!item?.originalImg) return;
-
-    const watermarkInfo = resolveDisplayWatermarkInfo(
-        item,
-        getEstimatedWatermarkInfo(item)
-    );
-    const showWatermarkInfo = watermarkInfo && isConfirmedWatermarkDecision(item);
-    const statusPresentation = getProcessedStatusPresentation(item);
-
-    processedInfo.innerHTML = `
-        <p>${TEXT.size}: ${item.originalImg.width}x${item.originalImg.height}</p>
-        ${showWatermarkInfo ? `<p>${TEXT.watermark}: ${watermarkInfo.size}x${watermarkInfo.size}</p>` : ''}
-        ${showWatermarkInfo ? `<p>${TEXT.position}: (${watermarkInfo.position.x},${watermarkInfo.position.y})</p>` : ''}
-        <p class="${statusPresentation.tone === 'warning' ? 'text-warning' : ''}">${TEXT.status}: ${statusPresentation.label}</p>
-    `;
-}
-
 async function processSingle(item) {
     try {
         const img = await loadImage(item.file);
@@ -432,9 +376,8 @@ function renderImageCardStatus(item) {
 
     statusEl.classList.remove('text-primary', 'text-warning');
     if (item.status === 'completed') {
-        const presentation = getProcessedStatusPresentation(item);
-        statusEl.textContent = presentation.label;
-        statusEl.classList.add(presentation.tone === 'warning' ? 'text-warning' : 'text-primary');
+        statusEl.textContent = TEXT.removed;
+        statusEl.classList.add('text-primary');
         return;
     }
 
@@ -561,38 +504,6 @@ function downloadImage(item) {
     a.href = item.processedUrl;
     a.download = `${item.name.replace(/\.[^.]+$/, "")}_enhanced.png`;
     a.click();
-}
-
-function setupSlider() {
-    const container = document.getElementById('comparisonContainer');
-    let isDown = false;
-
-    function move(e) {
-        if (!isDown) return;
-        const rect = container.getBoundingClientRect();
-        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-        if (!clientX) return;
-
-        const x = clientX - rect.left;
-        const percent = Math.min(Math.max(x / rect.width, 0), 1) * 100;
-
-        processedOverlay.style.width = `${percent}%`;
-        sliderHandle.style.left = `${percent}%`;
-    }
-
-    container.addEventListener('mousedown', (e) => {
-        isDown = true;
-        move(e);
-    });
-    window.addEventListener('mouseup', () => { isDown = false; });
-    window.addEventListener('mousemove', move);
-
-    container.addEventListener('touchstart', (e) => {
-        isDown = true;
-        move(e);
-    });
-    window.addEventListener('touchend', () => { isDown = false; });
-    window.addEventListener('touchmove', move);
 }
 
 init();
